@@ -1,6 +1,10 @@
 import React from 'react';
-import { TodoListProps, ITodo } from './todoTypes';
+import { ITodo } from './types';
 import Todo from './Todo';
+
+interface TodoListProps {
+  todos: ITodo[];
+}
 
 function TodoList({ todos }: TodoListProps) {
   return (

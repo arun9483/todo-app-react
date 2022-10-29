@@ -1,17 +1,17 @@
 import React, { useContext } from 'react';
 import classNames from 'classnames';
 
-import { TodoAppContext } from './Todos';
+import { TodoAppContext } from './TodoApp';
+import { updateFilter, clearCompleted } from './store/actions';
 import { getActiveCount } from './util';
-import { FilterActionKind, TodoActionKind } from './todoTypes';
 
 import './TodoFooter.css';
 
 function TodoFooter() {
-  const { list, filter, dispatchFilterAction, dispatchListAction } =
+  const { todo, filter, dispatchFilterAction, dispatchTodoAction } =
     useContext(TodoAppContext);
 
-  const count = getActiveCount(list);
+  const count = getActiveCount(todo.list);
 
   return (
     <footer className="footer">
@@ -22,13 +22,10 @@ function TodoFooter() {
         <li>
           <a
             href="#/"
-            className={classNames({ selected: filter === 0 })}
+            className={classNames({ selected: filter.filter === 0 })}
             onClick={(event) => {
               event.preventDefault();
-              dispatchFilterAction({
-                type: FilterActionKind.UPDATE_FILTER,
-                payload: 0,
-              });
+              dispatchFilterAction(updateFilter(0));
             }}
           >
             All
@@ -38,14 +35,11 @@ function TodoFooter() {
           <a
             href="#/active"
             className={classNames({
-              selected: filter === 1,
+              selected: filter.filter === 1,
             })}
             onClick={(event) => {
               event.preventDefault();
-              dispatchFilterAction({
-                type: FilterActionKind.UPDATE_FILTER,
-                payload: 1,
-              });
+              dispatchFilterAction(updateFilter(1));
             }}
           >
             Active
@@ -55,14 +49,11 @@ function TodoFooter() {
           <a
             href="#/completed"
             className={classNames({
-              selected: filter === 2,
+              selected: filter.filter === 2,
             })}
             onClick={(event) => {
               event.preventDefault();
-              dispatchFilterAction({
-                type: FilterActionKind.UPDATE_FILTER,
-                payload: 2,
-              });
+              dispatchFilterAction(updateFilter(2));
             }}
           >
             Completed
@@ -71,12 +62,7 @@ function TodoFooter() {
       </ul>
       <button
         className="clear-completed"
-        onClick={() =>
-          dispatchListAction({
-            type: TodoActionKind.CLEAR_COMPLETED,
-            payload: list[0],
-          })
-        }
+        onClick={() => dispatchTodoAction(clearCompleted())}
       >
         Clear completed
       </button>

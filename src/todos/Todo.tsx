@@ -7,13 +7,23 @@ import React, {
 } from 'react';
 import classNames from 'classnames';
 
-import { TodoProps, TodoActionKind, EditingActionKind } from './todoTypes';
-import { TodoAppContext } from './Todos';
+import {
+  deleteTodo,
+  toggleTodo,
+  editTodo as changeTodoTitle,
+  updateEditing,
+} from './store/actions';
+import { TodoAppContext } from './TodoApp';
+import { ITodo } from './types';
 
 import './Todo.css';
 
+interface TodoProps {
+  todo: ITodo;
+}
+
 function Todo(props: TodoProps) {
-  const { editing, dispatchListAction, dispatchEditingAction } =
+  const { editing, dispatchTodoAction, dispatchEditingAction } =
     useContext(TodoAppContext);
 
   const { todo } = props;
@@ -22,18 +32,12 @@ function Todo(props: TodoProps) {
   const editTodo = useRef<HTMLInputElement>(null);
 
   const onChangeHandler = useCallback(() => {
-    dispatchListAction({
-      type: TodoActionKind.TOGGLE_STATUS,
-      payload: todo,
-    });
-  }, [todo, dispatchListAction]);
+    dispatchTodoAction(toggleTodo(todo));
+  }, [todo, dispatchTodoAction]);
 
   const onDeleteHandler = useCallback(() => {
-    dispatchListAction({
-      type: TodoActionKind.DELETE,
-      payload: todo,
-    });
-  }, [todo, dispatchListAction]);
+    dispatchTodoAction(deleteTodo(todo));
+  }, [todo, dispatchTodoAction]);
 
   useEffect(() => {
     if (editing) {
@@ -46,34 +50,22 @@ function Todo(props: TodoProps) {
   const handleSubmit = () => {
     const val = editText.trim();
     if (val) {
-      dispatchListAction({
-        type: TodoActionKind.EDIT,
-        payload: { ...todo, title: val },
-      });
+      dispatchTodoAction(changeTodoTitle({ ...todo, title: val }));
     } else {
       onDeleteHandler();
     }
-    dispatchEditingAction({
-      type: EditingActionKind.UPDATE_EDITING_INFO,
-      payload: '',
-    });
+    dispatchEditingAction(updateEditing(''));
   };
 
-  const handleEdit = () => {
-    dispatchEditingAction({
-      type: EditingActionKind.UPDATE_EDITING_INFO,
-      payload: todo.id,
-    });
+  const handleEdit = useCallback(() => {
+    dispatchEditingAction(updateEditing(todo.id));
     setEditText(todo.title);
-  };
+  }, [todo, dispatchEditingAction]);
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key === 'Escape') {
       setEditText(todo.title);
-      dispatchEditingAction({
-        type: EditingActionKind.UPDATE_EDITING_INFO,
-        payload: '',
-      });
+      dispatchEditingAction(updateEditing(''));
     } else if (event.key === 'Enter') {
       handleSubmit();
     }
@@ -89,7 +81,7 @@ function Todo(props: TodoProps) {
     <li
       className={classNames({
         completed: todo.completed,
-        editing: editing === todo.id,
+        editing: editing.editing === todo.id,
       })}
     >
       <div className="view">

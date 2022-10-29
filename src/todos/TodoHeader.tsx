@@ -1,21 +1,18 @@
 import React, { useState, useContext } from 'react';
-import { TodoAppContext } from './Todos';
+import { TodoAppContext } from './TodoApp';
 import { getActiveCount } from './util';
 
-import { TodoActionKind } from './todoTypes';
+import { addTodo, toggleAll } from './store/actions';
 
 var ENTER_KEY = 'Enter';
 
 export default function TodoHeader() {
-  const { list, dispatchListAction } = useContext(TodoAppContext);
+  const { todo, dispatchTodoAction } = useContext(TodoAppContext);
 
   const [newTodo, setNewTodo] = useState('');
 
-  const toggleAll = () => {
-    dispatchListAction({
-      type: TodoActionKind.TOGGLE_ALL,
-      payload: list[0],
-    });
+  const flipAll = () => {
+    dispatchTodoAction(toggleAll());
   };
 
   const newTodoChangeHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -34,17 +31,17 @@ export default function TodoHeader() {
     const val = newTodo.trim();
 
     if (val) {
-      dispatchListAction({
-        type: TodoActionKind.ADD,
-        payload: {
+      dispatchTodoAction(
+        addTodo({
           id: `todo-${Math.random()}`,
           title: val,
           completed: false,
-        },
-      });
+        })
+      );
       setNewTodo('');
     }
   };
+
   return (
     <header className="header">
       <h1>todos</h1>
@@ -52,8 +49,8 @@ export default function TodoHeader() {
         id="toggle-all"
         className="toggle-all"
         type="checkbox"
-        onChange={toggleAll}
-        checked={getActiveCount(list) === 0}
+        onChange={flipAll}
+        checked={getActiveCount(todo.list) === 0}
       />
       <label htmlFor="toggle-all" />
       <input

@@ -1,4 +1,4 @@
-import { ITodo } from './todoTypes';
+import { ITodo } from './types';
 
 export function getActiveCount(list: ITodo[]): number {
   const count: number = list.reduce((acc, item) => {
