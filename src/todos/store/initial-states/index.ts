@@ -13,28 +13,7 @@ export interface EditingState {
 }
 
 export const todoInitialState: TodoState = {
-  list: [
-    {
-      id: 'a1',
-      title: 'a-one',
-      completed: true,
-    },
-    {
-      id: 'a2',
-      title: 'a-two',
-      completed: false,
-    },
-    {
-      id: 'a3',
-      title: 'a-three',
-      completed: false,
-    },
-    {
-      id: 'a4',
-      title: 'a-four',
-      completed: true,
-    },
-  ],
+  list: [],
 };
 export const filterInitialState: FilterState = { filter: 0 };
 export const editingInitialState: EditingState = { editing: '' };

@@ -15,6 +15,7 @@ import {
   editingReducer,
 } from './store';
 import Todos from './Todos';
+import { TODO_APP_KEY } from './constants';
 
 export interface TodoAppContextType {
   todo: TodoState;
@@ -29,10 +30,25 @@ export const TodoAppContext = createContext<TodoAppContextType>(
   {} as TodoAppContextType
 );
 
+function initTodoApp() {
+  let todo;
+  try {
+    let data = localStorage.getItem(TODO_APP_KEY) || '';
+    todo = JSON.parse(data);
+  } catch {
+    console.log('unable to fetch data from localStorage');
+  }
+
+  if (!todo) {
+    todo = todoInitialState;
+  }
+  return todo;
+}
+
 export default function TodoApp(): JSX.Element {
   const [todo, dispatchTodoAction] = useReducer<
     React.Reducer<TodoState, TodoAction>
-  >(todoReducer, todoInitialState);
+  >(todoReducer, initTodoApp());
   const [filter, dispatchFilterAction] = useReducer<
     React.Reducer<FilterState, FilterAction>
   >(filterReducer, filterInitialState);
